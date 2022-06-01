@@ -3,11 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-import plotly.express as px
 import seaborn as sns
-import altair as alt
 
-from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 import xgboost
 import xgboost as xgb
@@ -20,11 +17,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
-from sklearn.model_selection import GridSearchCV
-
-# --- feature scaling the paramenters for better results ---
-from sklearn.preprocessing import StandardScaler
 
 #---------------------------------#
 # Page layout
