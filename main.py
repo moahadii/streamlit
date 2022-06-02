@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 import seaborn as sns
 
 from sklearn.ensemble import RandomForestRegressor
@@ -19,7 +18,6 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-
 
 
 
@@ -54,6 +52,8 @@ def build_model(df_rf):
     # Data splitting
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=(100-splitting_ratio)/100)
 
+    
+
 
     st.markdown('**1.2. Data splits**')
     st.write('Shape of the dataframe')
@@ -71,8 +71,8 @@ def build_model(df_rf):
 
     rf = RandomForestRegressor(n_estimators=parameter_n_estimators,
         random_state=parameter_random_state,
-        #max_features=parameter_max_features,
-        max_features=5,
+        max_features=parameter_max_features,
+        #max_features=5,
         max_depth=parameter_max_depth,
         #criterion=parameter_criterion,
         #min_samples_split=parameter_min_samples_split,
@@ -86,8 +86,8 @@ def build_model(df_rf):
     xg = XGBRegressor(n_estimators=parameter_n_estimators,
         random_state=parameter_random_state,
         #_SklObjective = "reg:mean_squared_error",
-        #max_features=parameter_max_features,
-        max_features=5,
+        max_features=parameter_max_features,
+        #max_features=5,
         max_depth=parameter_max_depth,
         learning_rate=parameter_learning_rate,
         colsample_bytree=parameter_colsample_bytree,
@@ -206,7 +206,7 @@ with st.sidebar.subheader('2.1. Hyperparameters'):
     #parameter_gamma = st.sidebar.slider('gamma', 0.1, 5.0, 0.1, 0.1)
     #parameter_C = st.sidebar.slider('c', 50, 250, 150, 50)
     parameter_colsample_bytree = st.sidebar.slider('colsample_bytree', 0.1, 0.9, 0.7, 0.1)
-    #parameter_max_features = st.sidebar.select_slider('max_features', options=['auto', 'sqrt', 'log2'])
+    parameter_max_features = st.sidebar.select_slider('max_features', options=['auto', 'sqrt', 'log2'])
     parameter_max_depth = st.sidebar.select_slider('max_depth', options=[4, 5])
     #parameter_min_samples_split = st.sidebar.slider('Minimum number of samples required to split an internal node (min_samples_split)', 1, 10, 2, 1)
     #parameter_min_samples_leaf = st.sidebar.slider('Minimum number of samples required to be at a leaf node (min_samples_leaf)', 1, 10, 2, 1)
@@ -242,7 +242,7 @@ else:
         df_rf  = pd.read_csv("df_test.csv",parse_dates=True)
            
 
-        st.markdown('Data collected from test-cell on ZEB-lab, collected by SINTEF.')
+        st.markdown('Data collected by SINTEF from test-cell on ZEB-lab.')
         st.write(df_rf.head(5))
 
         build_model(df_rf)
