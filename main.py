@@ -1,7 +1,9 @@
+
 import streamlit as st
 import numpy as np 
 import matplotlib.pyplot as plt
 import pandas as pd
+
 
 import seaborn as sns
 
@@ -17,6 +19,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
+
+
+
 
 #---------------------------------#
 # Page layout
@@ -47,7 +52,7 @@ def build_model(df_rf):
     Z = df_rf.iloc[:,0:1]
 
     # Data splitting
-    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=(100-split_size)/100)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=(100-splitting_ratio)/100)
 
 
     st.markdown('**1.2. Data splits**')
@@ -66,33 +71,32 @@ def build_model(df_rf):
 
     rf = RandomForestRegressor(n_estimators=parameter_n_estimators,
         random_state=parameter_random_state,
-        max_features=parameter_max_features,
+        #max_features=parameter_max_features,
+        max_features=5,
         max_depth=parameter_max_depth,
         #criterion=parameter_criterion,
         #min_samples_split=parameter_min_samples_split,
         #min_samples_leaf=parameter_min_samples_leaf,
-        #bootstrap=parameter_bootstrap,
-        #oob_score=parameter_oob_score,
+        bootstrap=True,
+        oob_score=True,
+        verbose = 1,
         n_jobs=-1)
     rf.fit(X_train, Y_train)
 
     xg = XGBRegressor(n_estimators=parameter_n_estimators,
         random_state=parameter_random_state,
-        _SklObjective = "reg:mean_squared_error",
+        #_SklObjective = "reg:mean_squared_error",
         #max_features=parameter_max_features,
+        max_features=5,
         max_depth=parameter_max_depth,
         learning_rate=parameter_learning_rate,
         colsample_bytree=parameter_colsample_bytree,
-        #bootstrap=parameter_bootstrap,
-        oob_score=parameter_oob_score,
+        bootstrap=True,
+        verbosity = 1,
+        oob_score=True,
         n_jobs=-1)
     xg.fit(X_train, Y_train)
 
-
-    #svr = SVR(
-        #gamma=parameter_gamma,
-        #C=parameter_C)
-    #svr.fit(X_train, Y_train)
 
 
 
@@ -106,7 +110,11 @@ def build_model(df_rf):
 
     st.markdown('**2.2. Plots**')
     st.write('Plotting first 50 values of target-value:')
-    st.line_chart(Y[:50])
+
+
+
+    st.line_chart(Y[:50],use_container_width=True)
+    
 
 
 
@@ -117,13 +125,13 @@ def build_model(df_rf):
     st.markdown('**3.2. Test set**')
     Y_pred_test = rf.predict(X_test)
     st.write('Mean Absolute Error:')
-    st.info( mean_absolute_error(Y_test, Y_pred_test) )
+    st.info( "{:.3f}".format(mean_absolute_error(Y_test, Y_pred_test)) )
     st.write('Mean Squared Error:')
-    st.info( mean_squared_error(Y_test, Y_pred_test) )
+    st.info( "{:.3f}".format(mean_squared_error(Y_test, Y_pred_test)) )
     st.write('Root Mean Squared Error:')
-    st.info( np.sqrt(metrics.mean_squared_error(Y_test, Y_pred_test)) )
+    st.info( "{:.3f}".format(np.sqrt(metrics.mean_squared_error(Y_test, Y_pred_test))) )
     st.write('$R^2$-Score:')
-    st.info( r2_score(Y_test, Y_pred_test) )
+    st.info( "{:.3f}".format(r2_score(Y_test, Y_pred_test)) )
 
     st.markdown('**3.3. RF Prediction**')
     rf_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted RF':abs(Y_pred_test[:15])})
@@ -138,18 +146,17 @@ def build_model(df_rf):
 
     st.markdown('**4.2. Test set**')
     y_pred_test_xg = xg.predict(X_test)
-    y_pred_test_xgg = y_pred_test_xg.reshape(-1)
     st.write('Mean Absolute Error:')
-    st.info( mean_absolute_error(Y_test, y_pred_test_xg) )
+    st.info( "{:.3f}".format(mean_absolute_error(Y_test, y_pred_test_xg)) )
     st.write('Mean Squared Error:')
-    st.info( mean_squared_error(Y_test, y_pred_test_xg) )
+    st.info( "{:.3f}".format(mean_squared_error(Y_test, y_pred_test_xg)) )
     st.write('Root Mean Squared Error:')
-    st.info( np.sqrt(metrics.mean_squared_error(Y_test, y_pred_test_xg)) )
+    st.info( "{:.3f}".format(np.sqrt(metrics.mean_squared_error(Y_test, y_pred_test_xg))) )
     st.write('$R^2$-Score:')
-    st.info( r2_score(Y_test, y_pred_test_xg) )
+    st.info( "{:.3f}".format(r2_score(Y_test, y_pred_test_xg)) )
     
     st.markdown('**4.3. XGboost Prediction**')
-    xg_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted XGboost':abs(y_pred_test_xgg[:15])})
+    xg_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted XGboost':abs(y_pred_test_xg[:15])})
     st.write(xg_pred)
 
     st.markdown('**4.4. Plot with actual and predicted values**')
@@ -191,24 +198,24 @@ with st.sidebar.header('1. Upload CSV file'):
 
 # Sidebar - Specify parameter settings
 with st.sidebar.header('2. Set Parameters'):
-    split_size = st.sidebar.slider('Data split ratio (% for Training Set)', 10, 90, 80, 5)
+    splitting_ratio = st.sidebar.slider(' Split ratio (% for Training Set)', 10, 90, 80, 5)
 
 with st.sidebar.subheader('2.1. Hyperparameters'):
     parameter_n_estimators = st.sidebar.slider('n_estimators', 0, 500, 200, 50)
     parameter_learning_rate = st.sidebar.slider('learning_rate', 0.1, 1.0, 0.10,0.10)
     #parameter_gamma = st.sidebar.slider('gamma', 0.1, 5.0, 0.1, 0.1)
     #parameter_C = st.sidebar.slider('c', 50, 250, 150, 50)
-    parameter_colsample_bytree = st.sidebar.slider('Number of colsample trees (colsample_bytree)', 0.1, 0.9, 0.7, 0.1)
-    parameter_max_features = st.sidebar.select_slider('Max features (max_features)', options=['auto', 'sqrt', 'log2'])
-    parameter_max_depth = st.sidebar.select_slider('Max depth (max_depth)', options=[4, 5])
+    parameter_colsample_bytree = st.sidebar.slider('colsample_bytree', 0.1, 0.9, 0.7, 0.1)
+    #parameter_max_features = st.sidebar.select_slider('max_features', options=['auto', 'sqrt', 'log2'])
+    parameter_max_depth = st.sidebar.select_slider('max_depth', options=[4, 5])
     #parameter_min_samples_split = st.sidebar.slider('Minimum number of samples required to split an internal node (min_samples_split)', 1, 10, 2, 1)
     #parameter_min_samples_leaf = st.sidebar.slider('Minimum number of samples required to be at a leaf node (min_samples_leaf)', 1, 10, 2, 1)
 
 with st.sidebar.subheader('2.2. General Parameters'):
     parameter_random_state = st.sidebar.slider('Seed number (random_state)', 0, 1000, 222, 1)
     #parameter_criterion = st.sidebar.select_slider('Performance measure (criterion)', options=['mse', 'mae'])
-    parameter_bootstrap = st.sidebar.select_slider('Bootstrap samples when building trees (bootstrap)', options=[True, False])
-    parameter_oob_score = st.sidebar.select_slider('Whether to use out-of-bag samples to estimate the R^2 on unseen data (oob_score)', options=[True,False])
+    #parameter_bootstrap = st.sidebar.select_slider('Bootstrap samples when building trees (bootstrap)', options=[True, False])
+    #parameter_oob_score = st.sidebar.select_slider('Whether to use out-of-bag samples to estimate the R^2 on unseen data (oob_score)', options=[True,False])
     #parameter_n_jobs = st.sidebar.select_slider('Number of jobs to run in parallel (n_jobs)', options=[-1,1])
 
 
@@ -229,12 +236,10 @@ else:
     if st.button('Click here to explore existing dataframe'):
 
 
-        #st.markdown('The Diabetes dataset is used as the example.')
-        #st.write(df.head(5))
 
         
         ### alle df over her er endra
-        df_rf  = pd.read_csv("df_test.csv")
+        df_rf  = pd.read_csv("df_test.csv",parse_dates=True)
            
 
         st.markdown('Data collected from test-cell on ZEB-lab, collected by SINTEF.')
