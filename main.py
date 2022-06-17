@@ -50,7 +50,7 @@ def model_streamlit(df_model):
 
     
 
-
+    # retrieving the shape of dataframe
     st.markdown('**1.2. Data splits**')
     st.write('Shape of the dataframe')
     st.info(df_model.shape)
@@ -66,14 +66,9 @@ def model_streamlit(df_model):
     st.info(Y.name)
 
     rf = RandomForestRegressor(n_estimators=parameter_n_estimators,
-        #random_state=parameter_random_state,
         random_state=222,
         max_features=3,
-        #max_features=5,
         max_depth=4,
-        #criterion=parameter_criterion,
-        #min_samples_split=parameter_min_samples_split,
-        #min_samples_leaf=parameter_min_samples_leaf,
         bootstrap=True,
         oob_score=True,
         verbose = 1,
@@ -82,9 +77,7 @@ def model_streamlit(df_model):
 
     xg = XGBRegressor(n_estimators=parameter_n_estimators,
         random_state=222,
-        #_SklObjective = "reg:mean_squared_error",
         max_features=3,
-        #max_features=5,
         max_depth=4,
         learning_rate=0.1,
         colsample_bytree=0.7,
@@ -104,12 +97,12 @@ def model_streamlit(df_model):
 
     st.subheader('2. Visualizations')
     
-
+    # illustrating the dataframes statistics
     st.markdown('**2.1. Statistics**')
     st.write(df_model.describe().T)
 
 
-
+    # plotting the first 50 values
     st.markdown('**2.2. Plots**')
     st.write('Plotting first 50 values of target-value:')
 
@@ -122,7 +115,7 @@ def model_streamlit(df_model):
 
 
 				
-
+    # Random Forest
     st.subheader('3. Model Performance RF')
     st.markdown('**3.2. Test set**')
     Y_pred_test = rf.predict(X_test)
@@ -144,8 +137,8 @@ def model_streamlit(df_model):
     st.line_chart(rf_pred)
   
 
-    st.subheader('4. Model Performance XGboost')
-
+    # XGboost 
+    st.subheader('4. Model Performance XGBoost')
     st.markdown('**4.2. Test set**')
     y_pred_test_xg = xg.predict(X_test)
     st.write('Mean Absolute Error:')
@@ -157,15 +150,15 @@ def model_streamlit(df_model):
     st.write('$R^2$-Score:')
     st.info( "{:.3f}".format(r2_score(Y_test, y_pred_test_xg)) )
     
-    st.markdown('**4.3. XGboost Prediction**')
-    xg_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted XGboost':abs(y_pred_test_xg[:15])})
+    st.markdown('**4.3. XGBoost Prediction**')
+    xg_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted XGBoost':abs(y_pred_test_xg[:15])})
     st.write(xg_pred)
 
     st.markdown('**4.4. Plot with actual and predicted values**')
     st.line_chart(xg_pred)
 
 
-    st.subheader('5. Model Performance MRL')
+    st.subheader('5. Model Performance MLR')
     st.markdown('**5.2. Test set**')
     Y_pred_test_mrl = mrl.predict(X_test)
     st.write('Mean Absolute Error:')
@@ -177,8 +170,8 @@ def model_streamlit(df_model):
     st.write('$R^2$-Score:')
     st.info( "{:.3f}".format(r2_score(Y_test, Y_pred_test_mrl)) )
 
-    st.markdown('**5.3. MRL Prediction**')
-    mrl_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted RF':abs(Y_pred_test_mrl[:15])})
+    st.markdown('**5.3. MLR Prediction**')
+    mrl_pred = pd.DataFrame({ 'Samples of Y_test':Y_test[:15], 'Predicted MLR':abs(Y_pred_test_mrl[:15])})
     st.write(mrl_pred)
 
     
@@ -186,14 +179,15 @@ def model_streamlit(df_model):
     st.line_chart(mrl_pred)
 
 
-    st.subheader('5. Model Parameters for RF')
-    st.write(rf.get_params())
+    # checking wich hyperparameters that can be manipulated 
+    #st.subheader('5. Model Parameters for RF')
+    #st.write(rf.get_params())
 
-    st.subheader('6. Model Parameters for XGboost')
-    st.write(xg.get_params())
+    #st.subheader('6. Model Parameters for XGboost')
+    #st.write(xg.get_params())
 
-    st.subheader('7. Model Parameters for MRl')
-    st.write(mrl.get_params())
+    #st.subheader('7. Model Parameters for MRl')
+    #st.write(mrl.get_params())
 
 
 
@@ -202,7 +196,7 @@ def model_streamlit(df_model):
 #---------------------------------#
 st.write("""
 # Web-Application which predicts and forecast 
-Here  we present the four algorithms *Random Forest Regressor*, *Xgboost* and *Multi Linear Regression*.
+Here  we present the three algorithms *Random Forest Regressor*, *Xgboost* and *Multi Linear Regression*.
 """)
 
 #---------------------------------#
@@ -225,21 +219,6 @@ with st.sidebar.header('2. Set Parameters'):
 
 with st.sidebar.subheader('2.1. Hyperparameters'):
     parameter_n_estimators = st.sidebar.slider('n_estimators', 0, 500, 200, 50)
-    #parameter_learning_rate = st.sidebar.slider('learning_rate', 0.1, 1.0, 0.10,0.10)
-    #parameter_gamma = st.sidebar.slider('gamma', 0.1, 5.0, 0.1, 0.1)
-    #parameter_C = st.sidebar.slider('c', 50, 250, 150, 50)
-    #parameter_colsample_bytree = st.sidebar.slider('colsample_bytree', 0.1, 0.9, 0.7, 0.1)
-    #parameter_max_features = st.sidebar.select_slider('max_features', options=['auto', 'sqrt', 'log2'])
-    #parameter_max_depth = st.sidebar.select_slider('max_depth', options=[4, 5])
-    #parameter_min_samples_split = st.sidebar.slider('Minimum number of samples required to split an internal node (min_samples_split)', 1, 10, 2, 1)
-    #parameter_min_samples_leaf = st.sidebar.slider('Minimum number of samples required to be at a leaf node (min_samples_leaf)', 1, 10, 2, 1)
-
-#with st.sidebar.subheader('2.2. General Parameters'):
-    #parameter_random_state = st.sidebar.slider('Seed number (random_state)', 0, 1000, 222, 1)
-    #parameter_criterion = st.sidebar.select_slider('Performance measure (criterion)', options=['mse', 'mae'])
-    #parameter_bootstrap = st.sidebar.select_slider('Bootstrap samples when building trees (bootstrap)', options=[True, False])
-    #parameter_oob_score = st.sidebar.select_slider('Whether to use out-of-bag samples to estimate the R^2 on unseen data (oob_score)', options=[True,False])
-    #parameter_n_jobs = st.sidebar.select_slider('Number of jobs to run in parallel (n_jobs)', options=[-1,1])
 
 
 
@@ -261,7 +240,7 @@ else:
 
 
         
-        ### alle df over her er endra
+        
         df_model  = pd.read_csv("df_test.csv",parse_dates=True)
            
 
